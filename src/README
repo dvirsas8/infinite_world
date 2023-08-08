@@ -1,0 +1,111 @@
+dvir.sasson
+michalwolpert
+
+#################################
+UMLs
+#################################
+There are a lot of differences between the first UML we created and the
+second one and a few similarities.
+
+* Leaf class-
+we understood that we would need a leaf class, but we wanted it to
+extend the block class.
+We thought so because each leaf is also made of single blocks.
+On the contrary, in our work flow, we realized that the the leaf has a lot
+of behaviours that the block hasn't, so we decided to separate the two classes.
+This point leads us to the next subject- the abstract class Strategy.
+* Abstract class Strategy-
+First, we built the leaf class with the strategy inside it.
+Later, when we worked on the bonuses, and created more behaviours for other
+objects, we decided to make our code more modular and create a separate
+behaviour class which will hold the different objects behaviours.
+In that way, we thought, we could easily add more behaviours and the code would
+be more readable and understandable.
+* We added more classes for our bonuses- moon, bird, energyLevelMeter, static
+object. The static object class is also an idea that came up in our flow.
+After creating a class for the cloud we understood that we can generalize it to
+every static object and by that make the code more modular and convenient for
+adding more static objects comfortably.
+
+The similarities are the game objects factory which we knew we wanted,
+the leaf class, and the noise generator which we also understood that we want as
+a separate util.
+
+#################################
+Infinite World Creation
+#################################
+Our implementation of the infinite world is as follows:
+At every update of the Game Manager, we compare the current screen start
+x-value and end x-value to the previous update x-values.
+That information allows us to determine whether the avatar moved in the mean
+time, and if so, which direction it moved in. If the avatar moved right,
+we create blocks of terrain, trees and other game objects (such as clouds,
+birds, etc.) in the new area the avatar is moving into.
+We do that by holding 3 hashmaps. One for trees, one for terrain and one for
+static objects. Each hashmap maps between the on-screen x-value the objects are
+in, and an array of all the objects of that type that are stored there.
+With every update, we check the direction we moved in (as explained above),
+and the created objects are added to the map. At the same time, objects that
+are out of the screen on the other side are removed efficiently, since we
+only iterate over objects that are supposed to be deleted at that moment
+(objects that are in the relevant x-values).
+
+#################################
+Tree Package Implementation
+#################################
+In order to create a tree, we needed to get the ground height at the point
+the tree is supposed to be created in. Instead of letting the tree hold a
+terrain object, we decided to give it the Terrain class function which
+allows it to check the height of the ground by itself.
+We also decided that leaf should be in its own class. At first we used it
+as a regular GameObject, but then understood that it has special behaviours
+that justify it being on a class of its own. Those behaviours have been
+defined by a FallingLeafStrategy class, which every leaf object contains.
+
+#################################
+Dilemmas and Design Patterns
+#################################
+We debated a long time about how to implement leaf and bird behaviours, and
+eventually decided on creating an abstract Strategy class, and
+having a LeafStrategy and BirdStrategy classes which inherit from it.
+That decision was made mainly to allow the code to be modular and allow
+future implementations to change and extend the different behaviours easily.
+Every instance of a bird or a leaf contains its own instance of said
+strategy, and activates it in accordance to different world scenarios,
+which allows us to change its behaviour without changing any of the code
+that was written for the creation of those objects.
+A leaf may or may not have a strategy, and different leaves may have
+different strategies, and that is the biggest advantage of this decision.
+We also implemented a Moon class. We wanted to make the moon an instance
+of the Sun class, but due to API restrictions (we were instructed to have
+a certain Sun constructor and create() function), decided that it would be
+best for the moon to be on its own class.
+We implemented a StaticObject class, since objects who do not have any
+strategies are exactly the same except for their Renderable and dimensions.
+This class allows us to easily add different features and objects to
+the environment of the game, without writing almost any extra code.
+In addition, we created a factory to handle the creation of ordinary GameObjects
+(such as the sun, blocks, etc.) using a create() function that takes the
+name of the object we want to create and returns it, and also the creation
+of static GameObjects using a specialized function that can take the needed
+parameters.
+We also decided to implement a Creatable interface for objects that have the
+createInRange and deleteInRange functions. That allows us to avoid code duplication
+since the implementation of deleteInRange is the same for all of them, and lets
+us extend our code with more objects very easily.
+
+#################################
+Bonuses
+#################################
+We implemented a moon class, which creates a moon that moves in a similar
+manner to the sun object, reaches the top of the screen at midnight and
+goes back down when the sun rises.
+We added an energy meter, which displays the user's current energy level.
+We also added birds who fly from one side of the screen to the other. When
+the avatar collides with a bird, it explodes and drops a chicken on the
+ground, which restores the avatar's energy level when collected.
+We added clouds to the environment (using our static object class), and
+could have added more static objects, but decided to keep the environment
+design minimal, so that program flow can be optimal.
+Our avatar is a cat which has different animations for jumping, flying,
+falling and walking. It moves its legs one after the other while walking.
